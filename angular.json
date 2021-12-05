@@ -127,5 +127,8 @@
       }
     }
   },
-  "defaultProject": "cctv"
+  "defaultProject": "cctv",
+  "cli": {
+    "analytics": "12f57992-fa3e-4a82-ad03-b99f8ecc1a1f"
+  }
 }
