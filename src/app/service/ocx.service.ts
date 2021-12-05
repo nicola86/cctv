@@ -18,7 +18,7 @@ export class OcxService {
 
 
     }
-    init(el:any) {
+    init(el: any) {
         this.el = el
         if (!this.el) {
             throw new Error(`未找到指定容器,请检查是否设置正确的元素ID`)
@@ -29,57 +29,51 @@ export class OcxService {
         this.run()
     }
     run() {
-        let that = this
-        that.oWebControl = new WebControl({
-            szPluginContainer: that.el,
+        this.oWebControl = new WebControl({
+            szPluginContainer: this.el,
             iServicePortStart: 14460, // 对应 LocalServiceConfig.xml 中的ServicePortStart值
             iServicePortEnd: 14460, // 对应 LocalServiceConfig.xml 中的ServicePortEnd值
             szClassId: 'FD400310-EC09-4CE9-BFD4-13E8C6E7D6CA',
-            cbConnectSuccess: function () {
-                // that.callback(that.options.callback)
-                that.oWebControl.JS_StartService('window', { dllPath: './VPMClient.dll' }).then(
-                    function () {
-                        window.addEventListener('resize', that.resize.bind(that))
-                        window.addEventListener('scroll', that.resize.bind(that))
-                        const params = {
-                            playHandle: 0,
-                            showMode: 1,
-                            moduleIndex: 0,
-                            artemisToken: '',
-                            artemisUrl: '',
-                            productCode: 'demo',
-                            projectId: 564789565387296,
-                            strAuthorization: '',
-                            userIndexCode: '564171090096672',
-                            keepLiveUrl: window.location.origin,
-                            needPictureResult: 1,
-                            notifyPlayBackTimes: 10,
-                            defaultStreamType: 1
-
-                        }
-                        that.sendCommonParams('Hik_ParamBeforCreatWnd', params)
-      
-                    },
-                    function () {
-                        console.error('JS_CreateWnd failed')
-                        // that.error()
-                    }
-                )
-            },
-            cbConnectError: function () {
-                console.error('cbConnectError')
-                that.oWebControl = null
-                // that.error()
-            },
-            cbConnectClose: function (bNormalClose: any) {
-                // 连接异常断开：bNormalClose = false
-                // JS_Disconnect正常断开：bNormalClose = true
-                console.warn(`连接关闭. ${bNormalClose ? '正常断开' : '异常断开'}`)
-                that.oWebControl = null
-            }
+            cbConnectSuccess: this.ConnectSuccess,
+            cbConnectError: this.ConnectError,
+            cbConnectClose: this.ConnectClose
         })
     }
-    sendCommonParams(funcName = 'Hik_ParamBeforCreatWnd', params: any) {
+    ConnectError() {
+        console.error('cbConnectError')
+        this.oWebControl = null
+    }
+    ConnectClose(bNormalClose: any) {
+        console.warn(`连接关闭. ${bNormalClose ? '正常断开' : '异常断开'}`)
+        this.oWebControl = null
+    }
+    ConnectSuccess() {
+        this.oWebControl.JS_StartService('window', { dllPath: './VPMClient.dll' }).then((seccess: any, error: any) => {
+            if (error) {
+                console.error('JS_CreateWnd failed')
+            }
+            window.addEventListener('resize', this.resize.bind(this))
+            window.addEventListener('scroll', this.resize.bind(this))
+            const params = {
+                playHandle: 0,
+                showMode: 1,
+                moduleIndex: 0,
+                artemisToken: '',
+                artemisUrl: '',
+                productCode: '1637843786816841',
+                projectId: 564789565387296,
+                strAuthorization: '',
+                userIndexCode: '564171090096672',
+                keepLiveUrl: window.location.origin,
+                needPictureResult: 1,
+                notifyPlayBackTimes: 10,
+                defaultStreamType: 1
+
+            }
+            this.sendCommonParams('Hik_ParamBeforCreatWnd', params)
+        })
+    }
+    sendCommonParams(funcName: string, params: any) {
         this.request({
             funcName,
             arguments: params
@@ -105,12 +99,12 @@ export class OcxService {
         }
     }
     createWnd(options = {}) {
-        this.oWebControl.JS_CreateWnd(this.el, this.width, this.height, options).then(()=> {
+        this.oWebControl.JS_CreateWnd(this.el, this.width, this.height, options).then(() => {
             this.clientResize('SendPlayWndSize', this.width, this.height)
             this._setWndCover()
         })
     }
-    clientResize(funcName = 'SendPlayWndSize', width:any, height:any) {
+    clientResize(funcName = 'SendPlayWndSize', width: any, height: any) {
         this.request({
             funcName,
             arguments: {
