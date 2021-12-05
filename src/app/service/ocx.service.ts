@@ -25,6 +25,8 @@ export class OcxService {
         }
         this.width = this.el.offsetWidth
         this.height = this.el.offsetHeight
+        console.log(WebControl)
+        this.run()
     }
     run() {
         let that = this
