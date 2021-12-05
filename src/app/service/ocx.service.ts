@@ -96,10 +96,8 @@ export class OcxService {
         if (this.oWebControl !== null) {
             let { width, height } = this
             if (!this.lock) {
-                const $el = document.getElementById(this.el)
-                if (!$el) return
-                width = $el.offsetWidth
-                height = $el.offsetHeight
+                width = this.el.offsetWidth
+                height = this.el.offsetHeight
                 this.oWebControl.JS_Resize(width, height)
             } else {
                 this.oWebControl.JS_Resize(width, height)
@@ -109,16 +107,16 @@ export class OcxService {
     }
     createWnd(options = {}) {
         this.oWebControl.JS_CreateWnd(this.el, this.width, this.height, options).then(()=> {
-            this.clientResize('SendPlayWndSize', this.width, this.height)
+            this.clientResize()
             this._setWndCover()
         })
     }
-    clientResize(funcName = 'SendPlayWndSize', width:any, height:any) {
+    clientResize() {
         this.request({
-            funcName,
+            funcName:'SendPlayWndSize',
             arguments: {
-                arg1: width,
-                arg2: height
+                arg1: this.width,
+                arg2: this.height
             }
         })
     }
@@ -128,12 +126,12 @@ export class OcxService {
                 funcName: params.funcName,
                 arguments: params.arguments
             }).then((oData: any) => {
+                console.log(oData)
                 resolve(oData)
             })
         })
     }
     _setWndCover() {
-        if (!document.getElementById(this.el)) return
 
         const { width, height } = this
 
