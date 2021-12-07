@@ -35,7 +35,8 @@
             ],
             "scripts": [
               "src/assets/jquery/dist/jquery.min.js",
-              "src/assets/webControl/jsWebControl-1.0.0.min.js"
+              "src/assets/webControl/jsWebControl-1.0.0.min.js",
+              "src/assets/ocx.js"
             ]
           },
           "configurations": {

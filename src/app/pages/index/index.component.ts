@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HkapiService } from 'src/app/service/hkapi.service';
-import { OcxService } from 'src/app/service/ocx.service';
 import { StorageService } from 'src/app/service/storage.service';
+declare var Ocx:any
 
 
 @Component({
@@ -14,25 +14,44 @@ export class IndexComponent implements OnInit {
   appKey='16378437062165692'
   secretKey='RBnjdkepUKQZQaAAcoOZ'
 
+  ocxPlayer:any=null
+
   constructor(
     private hkapi:HkapiService,
-    private storage:StorageService,
-    private ocxPlayer:OcxService
+    private storage:StorageService
   ) { }
 
   ngOnInit(): void {
     this.setStorage()
   }
   ocxPlayerInit () {
-
-    this.ocxPlayer.init(this.cctv)
+    const that = this
+    // this.$store.commit('SET_ACTIVE_OCX_VM', this)
+    this.ocxPlayer = new Ocx({
+      el: 'cctvwin',
+      dllPath: './VPMClient.dll',
+      autoLoad: true,
+      error: () => {
+        console.info('webControl初始化失败。')
+        // this.showOcx = false
+      },
+      afterCreateWnd (ocx:any) {
+        console.info('webControl初始化成功。')
+        // that.initProcess()
+      },
+      callback: (data:any, ocx:any) => {
+        console.log(data)
+        // this.callbackData = data.responseMsg
+        // this.SnapPictureData = 'data:image/png;base64,' + data.responseMsg.SnapPictureData
+      }
+    })
   }
   // 获取插件版本信息
   getLocalVersion () {
     this.ocxPlayer.request({
       funcName: 'Hik_GetVersion',
       arguments: {}
-    }).then((res) => {
+    }).then((res:any) => {
       console.log(res)
     })
   }
